@@ -18,7 +18,7 @@ const codigosDescricao = {
 };
 
 const camposExtrasPorCodigo = {
-  A: ['carro', 'local', 'protocolo', 'horarioAbertura', 'defeito'],
+  A: ['carro', 'local', 'protocolo', 'horarioAbertura', 'defeito, 'Observação'],
   D: ['carro', 'local', 'protocolo', 'horarioAbertura', 'defeito'],
   B: ['local', 'protocolo', 'horarioAbertura', 'horarioFechamento'],
   E: ['carro', 'local', 'protocolo', 'horarioAbertura', 'motivo'],
