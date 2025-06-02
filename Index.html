@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lançamento de Perca de Partida</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Botão de alternância de tema -->
+  <button id="botao-tema">🌙 Tema Escuro</button>
+
+  <!-- Formulário principal -->
+  <form id="form-perca" autocomplete="off">
+    <h2>Lançamento de Perca de Partida</h2>
+
+    <label for="linha">Linha</label>
+    <input type="text" id="linha" required />
+
+    <label for="data">Data</label>
+    <input type="date" id="data" readonly tabindex="-1" />
+
+    <label for="sentido">Sentido</label>
+    <select id="sentido" required>
+      <option value="">Selecione</option>
+      <option value="ida">Ida</option>
+      <option value="volta">Volta</option>
+    </select>
+
+    <label for="horario">Horário</label>
+    <input type="time" id="horario" required />
+
+    <label for="codigo">Código de Perca</label>
+    <input type="text" id="codigo" required maxlength="1" oninput="atualizarDescricaoCodigo()" />
+    <div id="codigo-descricao" class="codigo-desc"></div>
+
+    <div id="campos-extras"></div>
+
+    <button type="submit">Lançar</button>
+    <button type="button" onclick="exportarExcel()">Exportar Excel</button>
+    <button type="button" onclick="excluirTodasPercas()">Excluir Todas</button>
+  </form>
+
+  <!-- Lista de lançamentos -->
+  <div class="lista">
+    <h3>Percas Lançadas</h3>
+    <div class="filtros">
+      <label for="filtro-linha">Filtrar Linha:</label>
+      <input type="text" id="filtro-linha" placeholder="Linha" />
+      <label for="filtro-sentido">Filtrar Sentido:</label>
+      <select id="filtro-sentido">
+        <option value="">Todos</option>
+        <option value="ida">Ida</option>
+        <option value="volta">Volta</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Linha</th>
+          <th>Sentido</th>
+          <th>Horário</th>
+          <th>Ocorrência</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="lista-percas"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal de Edição -->
+  <div id="modal-edicao" class="modal hidden">
+    <form id="form-edicao" autocomplete="off">
+      <h3>Editar Perca</h3>
+      <div id="campos-edicao"></div>
+      <div class="botoes-modal">
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancelar-edicao">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bibliotecas e scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
