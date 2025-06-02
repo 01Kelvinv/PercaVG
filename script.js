@@ -46,32 +46,43 @@ function atualizarDescricaoCodigo() {
   codigoInput.value = codigo;
   codigoDescricaoDiv.textContent = codigosDescricao[codigo] || '';
 
-  // Salvar valores existentes antes de limpar
   const valoresAnteriores = {};
   const inputsAnteriores = camposExtrasDiv.querySelectorAll('input, select, textarea');
   inputsAnteriores.forEach(input => {
     if (input.id) valoresAnteriores[input.id] = input.value;
   });
 
-  camposExtrasDiv.innerHTML = ''; // Limpa campos extras anteriores
+  camposExtrasDiv.innerHTML = '';
 
-  const campos = camposExtrasPorCodigo[codigo];
-  if (campos && campos.length > 0) {
-    campos.forEach(id => {
-      const label = document.createElement('label');
-      label.setAttribute('for', id);
-      label.textContent = id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1');
+  const campos = camposExtrasPorCodigo[codigo] || [];
+  campos.forEach(id => {
+    const label = document.createElement('label');
+    label.setAttribute('for', id);
+    label.textContent = id.charAt(0).toUpperCase() + id.slice(1).replace(/([A-Z])/g, ' $1');
 
-      const input = document.createElement('input');
-      input.type = id.toLowerCase().includes('horario') ? 'time' : 'text';
-      input.id = id;
-      input.name = id;
-      input.value = valoresAnteriores[id] || ''; // Restaura valor anterior, se existir
+    const input = document.createElement('input');
+    input.type = id.toLowerCase().includes('horario') ? 'time' : 'text';
+    input.id = id;
+    input.name = id;
+    input.value = valoresAnteriores[id] || '';
 
-      camposExtrasDiv.appendChild(label);
-      camposExtrasDiv.appendChild(input);
-    });
-  }
+    camposExtrasDiv.appendChild(label);
+    camposExtrasDiv.appendChild(input);
+  });
+
+  // Adiciona campo de observação
+  const obsLabel = document.createElement('label');
+  obsLabel.setAttribute('for', 'observacao');
+  obsLabel.textContent = 'Observação';
+
+  const obsInput = document.createElement('textarea');
+  obsInput.id = 'observacao';
+  obsInput.name = 'observacao';
+  obsInput.rows = 2;
+  obsInput.value = valoresAnteriores['observacao'] || '';
+
+  camposExtrasDiv.appendChild(obsLabel);
+  camposExtrasDiv.appendChild(obsInput);
 }
 
 function carregarPercas() {
@@ -145,13 +156,14 @@ function copiarPerca(index) {
   document.getElementById('codigo').value = p.codigo;
   atualizarDescricaoCodigo();
 
-  const extras = camposExtrasPorCodigo[p.codigo];
-  if (extras) {
-    extras.forEach(id => {
-      const input = document.getElementById(id);
-      if (input) input.value = p[id] || '';
-    });
-  }
+  const extras = camposExtrasPorCodigo[p.codigo] || [];
+  extras.forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = p[id] || '';
+  });
+
+  const obsInput = document.getElementById('observacao');
+  if (obsInput) obsInput.value = p.observacao || '';
 }
 
 function removerPercaFromBtn(btn) {
@@ -179,14 +191,11 @@ function abrirModalEdicao(perca, index) {
     label.setAttribute('for', `edit-${chave}`);
 
     let input;
-
     if (chave === 'sentido') {
       input = document.createElement('select');
       input.id = `edit-${chave}`;
       input.dataset.campo = chave;
-
-      const opcoes = ['', 'ida', 'volta'];
-      opcoes.forEach(op => {
+      ['', 'ida', 'volta'].forEach(op => {
         const option = document.createElement('option');
         option.value = op;
         option.textContent = op === '' ? 'Selecione' : op.charAt(0).toUpperCase() + op.slice(1);
@@ -202,6 +211,11 @@ function abrirModalEdicao(perca, index) {
     } else if (chave === 'horario' || chave.toLowerCase().includes('horario')) {
       input = document.createElement('input');
       input.type = 'time';
+      input.id = `edit-${chave}`;
+      input.value = perca[chave];
+      input.dataset.campo = chave;
+    } else if (chave === 'observacao') {
+      input = document.createElement('textarea');
       input.id = `edit-${chave}`;
       input.value = perca[chave];
       input.dataset.campo = chave;
@@ -225,15 +239,11 @@ document.getElementById('form-edicao').addEventListener('submit', function (e) {
   const percas = carregarPercas();
   if (indiceEdicaoAtual === null || !percas[indiceEdicaoAtual]) return;
 
-  const inputs = camposEdicaoDiv.querySelectorAll('input, select');
+  const inputs = camposEdicaoDiv.querySelectorAll('input, select, textarea');
   const atualizada = {};
 
   inputs.forEach(input => {
-    if(input.dataset.campo === 'codigo'){
-      atualizada[input.dataset.campo] = input.value.toUpperCase();
-    } else {
-      atualizada[input.dataset.campo] = input.value;
-    }
+    atualizada[input.dataset.campo] = input.dataset.campo === 'codigo' ? input.value.toUpperCase() : input.value;
   });
 
   percas[indiceEdicaoAtual] = atualizada;
@@ -295,7 +305,7 @@ document.getElementById('form-perca').addEventListener('submit', function (e) {
   const extras = {};
   const inputsExtras = camposExtrasDiv.querySelectorAll('input, select, textarea');
   inputsExtras.forEach(input => {
-    if(input.id && input.value.trim() !== '') {
+    if (input.id && input.value.trim() !== '') {
       extras[input.id] = input.value.trim();
     }
   });
